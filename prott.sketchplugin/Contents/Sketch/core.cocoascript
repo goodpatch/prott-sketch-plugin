@@ -604,7 +604,9 @@ var prott = {
             var cookie = [NSHTTPCookie requestHeaderFieldsWithCookies:prott.getSavedCookie()]
             while (artboard = [loop nextObject]) {
                 if (artboard.className() == "MSArtboardGroup") {
-                    prott.uploadArtboard(doc, artboard, cookie.Cookie, context)
+                    if (! prott.uploadArtboard(doc, artboard, cookie.Cookie, context)) {
+                        break
+                    }
                     count++
                 }
             }
@@ -650,7 +652,9 @@ var prott = {
         if (prott.getSavedValueFromKey("UploadPlatform") == 0) { // Web
             var cookie = [NSHTTPCookie requestHeaderFieldsWithCookies:prott.getSavedCookie()]
             while (artboard = [loop nextObject]) {
-                prott.uploadArtboard(doc, artboard, cookie.Cookie, context)
+                if (! prott.uploadArtboard(doc, artboard, cookie.Cookie, context)) {
+                    break
+                }
             }
         } else if (prott.getSavedValueFromKey("UploadPlatform") == 1) { // Mac
             var array = prott.getAppScreens() ? prott.getAppScreens() : [[NSMutableArray alloc] initWithCapacity:0]
@@ -674,6 +678,10 @@ var prott = {
         prott.showMessage("All artboards synced to Prott.", context)
     },
 
+    /**
+    * Upload artboard to prott
+    * @return {boolean} Return ture when the upload is successful
+    */
     "uploadArtboard": function(document, artboard, cookie, context){
         var copy = [artboard duplicate]
         var slice = MSExportRequest.exportRequestsFromExportableLayer(copy).firstObject()
@@ -713,7 +721,9 @@ var prott = {
                     prott.logoutFromSketch()
                 }
             }
+            return false;
         }
+        return true;
     },
 
     "uploadArtboardToAppLibrary": function(document, artboard, context){
